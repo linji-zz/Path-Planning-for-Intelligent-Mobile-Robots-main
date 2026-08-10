@@ -1,4 +1,4 @@
-﻿import numpy as np, math, random
+import numpy as np, math, random
 import matplotlib.pyplot as plt
 from matplotlib.patches import Rectangle
 
@@ -48,6 +48,12 @@ def gen_map(seed=42):
 OBSTACLES = gen_map()
 
 class GridEnv30:
+    def set_sparse(self, val=True):
+        self.sparse = val
+
+    def set_noise(self, level=0.2):
+        self.noise_level = level
+
     def __init__(self):
         self.size = 30
         self.obstacles = OBSTACLES
@@ -55,6 +61,8 @@ class GridEnv30:
         self.goal = (28, 28)
         self.actions = [(-1,-1),(-1,0),(-1,1),(0,-1),(0,1),(1,-1),(1,0),(1,1)]
         self.action_dim = 8
+        self.sparse = False
+        self.noise_level = 0.0
         self.reset()
 
     def reset(self):
@@ -75,6 +83,10 @@ class GridEnv30:
             if nx<0 or nx>=self.size or ny<0 or ny>=self.size: obs_flags.append(1.0)
             elif (nx,ny) in self.obstacles: obs_flags.append(1.0)
             else: obs_flags.append(0.0)
+        if self.noise_level > 0:
+            for i in range(len(obs_flags)):
+                if random.random() < self.noise_level:
+                    obs_flags[i] = 1.0 - obs_flags[i]
         return np.array([dx,dy,dist]+obs_flags, dtype=np.float32)
 
     def step(self, action):
@@ -83,15 +95,17 @@ class GridEnv30:
         old_pos = self.agent_pos
         new_x = old_pos[0]+dx; new_y = old_pos[1]+dy
         if new_x<0 or new_x>=self.size or new_y<0 or new_y>=self.size:
-            self.done = True; return self._get_state(), -10.0, True, {"reason":"boundary"}
+            self.done = True; return self._get_state(), -1.0 if self.sparse else -10.0, True, {"reason":"boundary"}
         if (new_x,new_y) in self.obstacles:
-            self.done = True; return self._get_state(), -10.0, True, {"reason":"collision"}
+            self.done = True; return self._get_state(), -1.0 if self.sparse else -10.0, True, {"reason":"collision"}
         self.agent_pos = (new_x,new_y)
         old_d = math.hypot(old_pos[0]-self.goal[0], old_pos[1]-self.goal[1])
         new_d = math.hypot(self.agent_pos[0]-self.goal[0], self.agent_pos[1]-self.goal[1])
         reward = (old_d-new_d)*2.0
         if self.agent_pos == self.goal:
-            self.done = True; return self._get_state(), 50.0, True, {"reason":"goal"}
+            self.done = True; return self._get_state(), 10.0 if self.sparse else 50.0, True, {"reason":"goal"}
+        if self.sparse:
+            return self._get_state(), 0.0, False, {}
         if self.steps >= 500:
             self.done = True; return self._get_state(), reward, True, {"reason":"max_steps"}
         return self._get_state(), reward, False, {}

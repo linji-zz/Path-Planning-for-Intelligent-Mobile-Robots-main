@@ -32,6 +32,9 @@ class GridEnvLarge:
     def set_sparse(self, val=True):
         self.sparse = val
 
+    def set_noise(self, level=0.2):
+        self.noise_level = level
+
     def __init__(self, seed=42):
         self.size = 20
         self.obstacles = OBSTACLES
@@ -41,6 +44,7 @@ class GridEnvLarge:
         self.action_dim = 8
         random.seed(seed); np.random.seed(seed)
         self.sparse = False
+        self.noise_level = 0.0
         self.reset()
 
     def reset(self):
@@ -61,6 +65,11 @@ class GridEnvLarge:
             if nx<0 or nx>=self.size or ny<0 or ny>=self.size: obs_flags.append(1.0)
             elif (nx,ny) in self.obstacles: obs_flags.append(1.0)
             else: obs_flags.append(0.0)
+        # Sensor noise: randomly flip obstacle flags
+        if self.noise_level > 0:
+            for i in range(len(obs_flags)):
+                if random.random() < self.noise_level:
+                    obs_flags[i] = 1.0 - obs_flags[i]
         return np.array([dx,dy,dist]+obs_flags, dtype=np.float32)
 
     def step(self, action):

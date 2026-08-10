@@ -8,7 +8,7 @@ import torch, torch.nn as nn, torch.optim as optim
 
 sys.path.insert(0, r"C:\Users\CAIHUI\Path-Planning-for-Intelligent-Mobile-Robots-main\project")
 
-from env_large import GridEnvLarge
+from env_large30 import GridEnv30
 
 from models import CrossAttentionDQN
 
@@ -16,19 +16,18 @@ from models import CrossAttentionDQN
 
 EXPS = {
 
-    "S0": {"coupled": False, "cat": False, "name": "S0_sparse_baseline_20x20", "sparse": True},
-    "S0A": {"coupled": False, "cat": False, "name": "S0_ASGS_20x20", "sparse": True, "asgs": True},
+    "S0": {"coupled": False, "cat": False, "name": "S0_sparse_baseline_30x30", "sparse": True},
+    "S0A": {"coupled": False, "cat": False, "name": "S0_ASGS_30x30", "sparse": True, "asgs": True},
+    "S0B": {"coupled": False, "cat": False, "name": "S0_ASGS_tuned_30x30", "sparse": True, "asgs": True, "asgs_alpha": 0.5, "asgs_lambda_min": 2.0, "asgs_lambda_max": 6.0},
 
-    "E1": {"coupled": True,  "cat": False, "name": "E1_coupled_20x20"},
-    "E1A": {"coupled": True,  "cat": False, "name": "E1_coupled_ASGS_20x20", "asgs": True},
+    "E1": {"coupled": True,  "cat": False, "name": "E1_coupled_30x30"},
+    "E1A": {"coupled": True,  "cat": False, "name": "E1_coupled_ASGS_30x30", "asgs": True},
 
-    "A1": {"coupled": "no_openness", "cat": False, "name": "A1_no_openness_20x20"},
+    "A1": {"coupled": "no_openness", "cat": False, "name": "A1_no_openness_30x30"},
 
-    "A2": {"coupled": "no_alignment", "cat": False, "name": "A2_no_alignment_20x20"},
+    "A2": {"coupled": "no_alignment", "cat": False, "name": "A2_no_alignment_30x30"},
 
-    "N1": {"coupled": True,  "cat": False, "name": "N1_MLP_noise20_20x20", "noise": 0.2},
-    "N2": {"coupled": True,  "cat": True,  "name": "N2_CAT_noise20_20x20", "noise": 0.2},
-    "E2": {"coupled": True,  "cat": True,  "name": "E2_CAT_coupled_20x20"},
+    "E2": {"coupled": True,  "cat": True,  "name": "E2_CAT_coupled_30x30"},
 
 }
 
@@ -36,7 +35,7 @@ EXPS = {
 
 if len(sys.argv) < 2 or sys.argv[1] not in EXPS:
 
-    print("Usage: python train_large.py S0|S0A|E1|E1A|A1|A2|E2|N1|N2")
+    print("Usage: python train_large30.py S0|S0A|S0B|E1|E1A|A1|A2|E2")
 
     sys.exit(1)
 
@@ -56,7 +55,9 @@ USE_COUPLED = cfg["coupled"]
 USE_CAT = cfg["cat"]
 SPARSE = cfg.get("sparse", False)
 ASGS = cfg.get("asgs", False)
-NOISE = cfg.get("noise", 0.0)
+ASGS_ALPHA = cfg.get("asgs_alpha", 0.1)
+ASGS_LAM_MIN = cfg.get("asgs_lambda_min", 5.0)
+ASGS_LAM_MAX = cfg.get("asgs_lambda_max", 15.0)
 
 
 
@@ -70,11 +71,9 @@ print("="*60, flush=True)
 
 
 
-env = GridEnvLarge(seed=SEED)
+env = GridEnv30()
 if SPARSE:
     env.set_sparse(True)
-if NOISE > 0:
-    env.set_noise(NOISE)
 
 SEQ_LEN = 5 if USE_CAT else 1
 
@@ -153,7 +152,7 @@ for ep in range(EPISODES):
 
 
             if ASGS:
-                weights_list = [0.1 if o > 0.5 else 1.0 for o in obs]
+                weights_list = [ASGS_ALPHA if o > 0.5 else 1.0 for o in obs]
                 total_w = sum(weights_list)
                 r = random.random() * total_w
                 cum = 0
@@ -177,7 +176,7 @@ for ep in range(EPISODES):
 
                     
                     if ASGS:
-                        lam = 5.0 + 10.0 * ep / EPISODES
+                        lam = ASGS_LAM_MIN + (ASGS_LAM_MAX - ASGS_LAM_MIN) * ep / EPISODES
                         q = q - torch.FloatTensor(obs).unsqueeze(0).to(device) * lam
                     
                     action = q.max(1)[1].item()
@@ -191,7 +190,7 @@ for ep in range(EPISODES):
 
                     
                     if ASGS:
-                        lam = 5.0 + 10.0 * ep / EPISODES
+                        lam = ASGS_LAM_MIN + (ASGS_LAM_MAX - ASGS_LAM_MIN) * ep / EPISODES
                         q = q - torch.FloatTensor(obs).unsqueeze(0).to(device) * lam
                     
                     action = q.max(1)[1].item()
