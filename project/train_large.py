@@ -29,6 +29,7 @@ EXPS = {
     "N1": {"coupled": True,  "cat": False, "name": "N1_MLP_noise20_20x20", "noise": 0.2},
     "N2": {"coupled": True,  "cat": True,  "name": "N2_CAT_noise20_20x20", "noise": 0.2},
     "E2": {"coupled": True,  "cat": True,  "name": "E2_CAT_coupled_20x20"},
+    "E1AC": {"coupled": True, "cat": True, "name": "E1_CAT_ASGS_20x20", "asgs": True},
 
 }
 
@@ -36,7 +37,7 @@ EXPS = {
 
 if len(sys.argv) < 2 or sys.argv[1] not in EXPS:
 
-    print("Usage: python train_large.py S0|S0A|E1|E1A|A1|A2|E2|N1|N2")
+    print("Usage: python train_large.py S0|S0A|E1|E1A|A1|A2|E2|N1|N2|E1AC")
 
     sys.exit(1)
 

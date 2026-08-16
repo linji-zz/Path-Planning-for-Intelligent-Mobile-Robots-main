@@ -28,6 +28,7 @@ EXPS = {
     "A2": {"coupled": "no_alignment", "cat": False, "name": "A2_no_alignment_30x30"},
 
     "E2": {"coupled": True,  "cat": True,  "name": "E2_CAT_coupled_30x30"},
+    "E1AC": {"coupled": True, "cat": True, "name": "E1_CAT_ASGS_30x30", "asgs": True},
 
 }
 
@@ -35,7 +36,7 @@ EXPS = {
 
 if len(sys.argv) < 2 or sys.argv[1] not in EXPS:
 
-    print("Usage: python train_large30.py S0|S0A|S0B|E1|E1A|A1|A2|E2")
+    print("Usage: python train_large30.py S0|S0A|S0B|E1|E1A|A1|A2|E2|E1AC")
 
     sys.exit(1)
 
