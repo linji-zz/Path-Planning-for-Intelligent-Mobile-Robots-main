@@ -375,13 +375,19 @@ for ep in range(200):
 
                 seq = torch.FloatTensor(np.stack(list(history))).unsqueeze(0).to(device)
 
-                a = policy(seq).max(1)[1].item()
+                q = policy(seq)
 
             else:
 
                 st_t = torch.FloatTensor(s).unsqueeze(0).to(device)
 
-                a = policy(st_t).max(1)[1].item()
+                q = policy(st_t)
+
+            if ASGS:
+                lam = 15.0
+                q = q - torch.FloatTensor(s[3:11]).unsqueeze(0).to(device) * lam
+
+            a = q.max(1)[1].item()
 
         ns, _, done, info = env.step(a)
 
