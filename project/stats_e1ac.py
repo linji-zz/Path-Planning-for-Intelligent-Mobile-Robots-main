@@ -13,6 +13,7 @@ for fn in [
     "E1_CAT_ASGS_20x20_reward_log.csv",
     "E1_CAT_ASGS_20x20_run2_reward_log.csv",
     "E1_CAT_ASGS_20x20_run3_reward_log.csv",
+    "E1_CAT_ASGS_30x30_reward_log.csv",
     "E1_coupled_ASGS_20x20_reward_log.csv",
     "E2_CAT_coupled_20x20_reward_log.csv",
     "E1_coupled_20x20_reward_log.csv",
