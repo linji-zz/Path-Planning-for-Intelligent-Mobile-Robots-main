@@ -1,4 +1,4 @@
-import numpy as np
+import numpy as np  # noqa
 
 def stat(fn):
     d = np.loadtxt(fn)
