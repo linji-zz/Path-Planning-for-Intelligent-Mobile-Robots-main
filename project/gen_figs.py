@@ -35,6 +35,11 @@ device = torch.device("cpu")
 SEQ_LEN = 5
 ASGS_LAM = 15.0  # final lambda for ASGS greedy eval (matches paper methodology)
 
+# CLI: python gen_figs.py [dpi] [outdir]
+DPI = int(sys.argv[1]) if len(sys.argv) > 1 else 150
+OUTDIR = sys.argv[2] if len(sys.argv) > 2 else PROJ
+os.makedirs(OUTDIR, exist_ok=True)
+
 
 # ---------------- Networks / loaders ----------------
 class MLPDQN(nn.Module):
@@ -210,7 +215,7 @@ def make_path_figure(methods, env, out_name, title_suffix):
     for ax in axes[len(methods):]:
         ax.axis('off')
     plt.tight_layout()
-    plt.savefig(os.path.join(PROJ, out_name), dpi=150)
+    plt.savefig(os.path.join(OUTDIR, out_name), dpi=DPI)
     plt.close()
     print(f"Saved {out_name}")
 
@@ -234,7 +239,7 @@ def make_reward_figure(logs, out_name):
     ax.legend(fontsize=8)
     ax.grid(alpha=0.3)
     plt.tight_layout()
-    plt.savefig(os.path.join(PROJ, out_name), dpi=150)
+    plt.savefig(os.path.join(OUTDIR, out_name), dpi=DPI)
     plt.close()
     print(f"Saved {out_name}")
 
@@ -255,7 +260,7 @@ def make_traditional_figures():
         path, _ = run_path(net, env, use_asgs=True)
         plot_paths(axes[2], env, path, "E1A (ours)", "red")
         plt.tight_layout()
-        plt.savefig(os.path.join(PROJ, f"fig_trad_compare_{name}.png"), dpi=150)
+        plt.savefig(os.path.join(OUTDIR, f"fig_trad_compare_{name}.png"), dpi=DPI)
         plt.close()
         print(f"Saved fig_trad_compare_{name}.png")
 
@@ -293,7 +298,7 @@ def make_noise_figure():
     ax.grid(alpha=0.3)
     ax.legend()
     plt.tight_layout()
-    plt.savefig(os.path.join(PROJ, "fig_noise_robustness.png"), dpi=150)
+    plt.savefig(os.path.join(OUTDIR, "fig_noise_robustness.png"), dpi=DPI)
     plt.close()
     print("Saved fig_noise_robustness.png")
 
