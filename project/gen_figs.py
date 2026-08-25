@@ -197,6 +197,16 @@ logs20 = [
     ("E1AC CAT+CRF+ASGS","E1_CAT_ASGS_20x20_reward_log.csv",         "project", "tab:cyan"),
 ]
 
+logs30 = [
+    ("S0 Sparse",        "S0_sparse_baseline_30x30_reward_log.csv",  "project", "tab:red"),
+    ("E1 Coupled",       "E1_coupled_30x30_reward_log.csv",          "project", "tab:blue"),
+    ("E1A Coupled+ASGS", "E1_coupled_ASGS_30x30_reward_log.csv",     "project", "tab:green"),
+    ("DDQN",             "DDQN_30x30_coupled_reward_log.csv",        "root",    "tab:purple"),
+    ("Dueling DQN",      "DUELING_30x30_coupled_reward_log.csv",     "root",    "tab:orange"),
+    ("PER DQN",          "PER_30x30_coupled_reward_log.csv",         "root",    "tab:brown"),
+    ("E1AC CAT+CRF+ASGS","E1_CAT_ASGS_30x30_reward_log.csv",         "project", "tab:cyan"),
+]
+
 
 def make_path_figure(methods, env, out_name, title_suffix):
     n = len(methods)
@@ -220,7 +230,7 @@ def make_path_figure(methods, env, out_name, title_suffix):
     print(f"Saved {out_name}")
 
 
-def make_reward_figure(logs, out_name):
+def make_reward_figure(logs, out_name, title):
     def moving_avg(d, w=100):
         if len(d) < w:
             return d
@@ -235,7 +245,7 @@ def make_reward_figure(logs, out_name):
             ax.plot(np.arange(len(m)), m, color=color, label=label, linewidth=1.3)
     ax.set_xlabel("Episode")
     ax.set_ylabel("Reward (moving avg)")
-    ax.set_title("20x20 Reward Convergence (all methods)")
+    ax.set_title(title)
     ax.legend(fontsize=8)
     ax.grid(alpha=0.3)
     plt.tight_layout()
@@ -267,36 +277,44 @@ def make_traditional_figures():
 
 def make_noise_figure():
     import json
-    json_path = os.path.join(PROJ, "noise_robustness_results.json")
-    if not os.path.exists(json_path):
-        print("SKIP fig_noise_robustness.png: run eval_noise_multiseed.py first "
-              "(missing noise_robustness_results.json)")
+    paths = [
+        ("20x20", os.path.join(PROJ, "noise_robustness_results.json")),
+        ("30x30", os.path.join(PROJ, "noise_robustness_results_30x30_noasgs.json")),
+    ]
+    present = [(name, p) for name, p in paths if os.path.exists(p)]
+    if not present:
+        print("SKIP fig_noise_robustness.png: run noise eval scripts first")
         return
-    with open(json_path, "r", encoding="utf-8") as f:
-        res = json.load(f)
 
-    noise_levels = res["noise_levels"]
+    fig, axes = plt.subplots(1, len(present), figsize=(7 * len(present), 5))
+    if len(present) == 1:
+        axes = [axes]
 
-    def mean_std(key):
-        means = [np.mean(res[key][str(lv)]) for lv in noise_levels]
-        stds = [np.std(res[key][str(lv)]) for lv in noise_levels]
-        return means, stds
+    for ax, (name, p) in zip(axes, present):
+        with open(p, "r", encoding="utf-8") as f:
+            res = json.load(f)
+        noise_levels = res["noise_levels"]
 
-    mlp_mean, mlp_std = mean_std("mlp")
-    cat_mean, cat_std = mean_std("cat")
+        def mean_std(key):
+            means = [np.mean(res[key][str(lv)]) for lv in noise_levels]
+            stds = [np.std(res[key][str(lv)]) for lv in noise_levels]
+            return means, stds
 
-    x = [lv * 100 for lv in noise_levels]
-    fig, ax = plt.subplots(figsize=(7, 5))
-    ax.errorbar(x, mlp_mean, yerr=mlp_std, fmt='o-', color='tab:red',
-                label='MLP', linewidth=1.5, capsize=3)
-    ax.errorbar(x, cat_mean, yerr=cat_std, fmt='s-', color='tab:blue',
-                label='CAT', linewidth=1.5, capsize=3)
-    ax.set_xlabel("Sensor noise level (%)")
-    ax.set_ylabel("Success rate (%)")
-    ax.set_title("Noise robustness (clean-trained models, mean±std)")
-    ax.set_ylim(0, 105)
-    ax.grid(alpha=0.3)
-    ax.legend()
+        mlp_mean, mlp_std = mean_std("mlp")
+        cat_mean, cat_std = mean_std("cat")
+
+        x = [lv * 100 for lv in noise_levels]
+        ax.errorbar(x, mlp_mean, yerr=mlp_std, fmt='o-', color='tab:red',
+                    label='MLP', linewidth=1.5, capsize=3)
+        ax.errorbar(x, cat_mean, yerr=cat_std, fmt='s-', color='tab:blue',
+                    label='CAT', linewidth=1.5, capsize=3)
+        ax.set_xlabel("Sensor noise level (%)")
+        ax.set_ylabel("Success rate (%)")
+        ax.set_title(f"{name} noise robustness (mean±std)")
+        ax.set_ylim(0, 105)
+        ax.grid(alpha=0.3)
+        ax.legend()
+
     plt.tight_layout()
     plt.savefig(os.path.join(OUTDIR, "fig_noise_robustness.png"), dpi=DPI)
     plt.close()
@@ -309,7 +327,8 @@ if __name__ == "__main__":
 
     make_path_figure(methods20, GridEnvLarge(), "fig_paths_20x20_all.png", "20x20")
     make_path_figure(methods30, GridEnv30(), "fig_paths_30x30_all.png", "30x30")
-    make_reward_figure(logs20, "fig_reward_20x20_all.png")
+    make_reward_figure(logs20, "fig_reward_20x20_all.png", "20x20 Reward Convergence (all methods)")
+    make_reward_figure(logs30, "fig_reward_30x30_all.png", "30x30 Reward Convergence (all methods)")
     make_traditional_figures()
     make_noise_figure()
     print("ALL FIGURES DONE")
