@@ -19,9 +19,9 @@ FIG_CAPTIONS = {
     "fig_reward_20x20_all.png": "图2 20×20地图奖励收敛曲线",
     "fig_paths_30x30_all.png": "图3 30×30地图各方法路径对比",
     "fig_reward_30x30_all.png": "图4 30×30地图奖励收敛曲线",
-    "fig_trad_compare_20x20.png": "图5(a) 20×20地图与传统算法对比",
-    "fig_trad_compare_30x30.png": "图5(b) 30×30地图与传统算法对比",
-    "fig_noise_robustness.png": "图6 噪声鲁棒性对比",
+    "fig_trad_compare_20x20.png": "图5 20×20地图与传统算法对比",
+    "fig_trad_compare_30x30.png": "图6 30×30地图与传统算法对比",
+    "fig_noise_robustness.png": "图7 噪声鲁棒性对比",
 }
 FIG_RE = re.compile(r"fig_[A-Za-z0-9_]+\.png")
 
