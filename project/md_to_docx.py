@@ -15,13 +15,25 @@ SRC = os.path.join(BASE, "paper_draft.md")
 OUT = os.path.join(BASE, "paper_draft.docx")
 
 FIG_CAPTIONS = {
-    "fig_paths_20x20_all.png": "图1 20×20地图各方法路径对比",
-    "fig_reward_20x20_all.png": "图2 20×20地图奖励收敛曲线",
-    "fig_paths_30x30_all.png": "图3 30×30地图各方法路径对比",
-    "fig_reward_30x30_all.png": "图4 30×30地图奖励收敛曲线",
-    "fig_trad_compare_20x20.png": "图5 20×20地图与传统算法对比",
-    "fig_trad_compare_30x30.png": "图6 30×30地图与传统算法对比",
-    "fig_noise_robustness.png": "图7 噪声鲁棒性对比",
+    "fig_path_20x20_S0.png": "图1 20×20地图 S0 Sparse 路径",
+    "fig_path_20x20_E1.png": "图2 20×20地图 E1 Coupled 路径",
+    "fig_path_20x20_E1A.png": "图3 20×20地图 E1A Coupled+ASGS 路径",
+    "fig_path_20x20_DDQN.png": "图4 20×20地图 DDQN 路径",
+    "fig_path_20x20_Dueling.png": "图5 20×20地图 Dueling DQN 路径",
+    "fig_path_20x20_PER.png": "图6 20×20地图 PER DQN 路径",
+    "fig_path_20x20_E1AC.png": "图7 20×20地图 E1AC 三合一 路径",
+    "fig_reward_20x20_all.png": "图8 20×20地图奖励收敛曲线",
+    "fig_path_30x30_S0.png": "图9 30×30地图 S0 Sparse 路径",
+    "fig_path_30x30_E1.png": "图10 30×30地图 E1 Coupled 路径",
+    "fig_path_30x30_E1A.png": "图11 30×30地图 E1A Coupled+ASGS 路径",
+    "fig_path_30x30_DDQN.png": "图12 30×30地图 DDQN 路径",
+    "fig_path_30x30_Dueling.png": "图13 30×30地图 Dueling DQN 路径",
+    "fig_path_30x30_PER.png": "图14 30×30地图 PER DQN 路径",
+    "fig_path_30x30_E1AC.png": "图15 30×30地图 E1AC 三合一 路径",
+    "fig_reward_30x30_all.png": "图16 30×30地图奖励收敛曲线",
+    "fig_trad_compare_20x20.png": "图17 20×20地图与传统算法对比",
+    "fig_trad_compare_30x30.png": "图18 30×30地图与传统算法对比",
+    "fig_noise_robustness.png": "图19 噪声鲁棒性对比",
 }
 FIG_RE = re.compile(r"fig_[A-Za-z0-9_]+\.png")
 

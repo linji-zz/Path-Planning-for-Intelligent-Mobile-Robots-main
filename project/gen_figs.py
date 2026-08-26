@@ -208,27 +208,23 @@ logs30 = [
 ]
 
 
-def make_path_figure(methods, env, out_name, title_suffix):
-    n = len(methods)
-    ncols = 4
-    nrows = (n + ncols - 1) // ncols
-    fig, axes = plt.subplots(nrows, ncols, figsize=(ncols * 4, nrows * 4))
-    axes = np.atleast_1d(axes).flatten()
-    for idx, (ax, (label, mfile, kind, use_asgs, loc)) in enumerate(zip(axes, methods)):
-        letter = chr(ord('a') + idx)
+def make_path_figures_individual(methods, env, map_name):
+    """每个方法生成一张独立的路径图（拆分宫格）。"""
+    for label, mfile, kind, use_asgs, loc in methods:
+        short = label.split()[0]
+        out_name = f"fig_path_{map_name}_{short}.png"
+        fig, ax = plt.subplots(figsize=(6, 6))
         try:
             net = load_net(resolve(mfile, loc), kind)
             path, info = run_path(net, env, use_cat=(kind == "cat"), use_asgs=use_asgs)
-            plot_paths(ax, env, path, f"({letter}) {label} ({len(path) - 1} steps)")
+            plot_paths(ax, env, path, f"{label} ({len(path) - 1} steps)")
         except Exception as e:
             ax.text(0.5, 0.5, f"{label}: missing", ha='center', va='center')
-            ax.set_title(f"({letter}) {label}", fontsize=10)
-    for ax in axes[len(methods):]:
-        ax.axis('off')
-    plt.tight_layout()
-    plt.savefig(os.path.join(OUTDIR, out_name), dpi=DPI)
-    plt.close()
-    print(f"Saved {out_name}")
+            ax.set_title(label, fontsize=10)
+        plt.tight_layout()
+        plt.savefig(os.path.join(OUTDIR, out_name), dpi=DPI)
+        plt.close()
+        print(f"Saved {out_name}")
 
 
 def make_reward_figure(logs, out_name, title):
@@ -326,8 +322,8 @@ if __name__ == "__main__":
     from env_large import GridEnvLarge
     from env_large30 import GridEnv30
 
-    make_path_figure(methods20, GridEnvLarge(), "fig_paths_20x20_all.png", "20x20")
-    make_path_figure(methods30, GridEnv30(), "fig_paths_30x30_all.png", "30x30")
+    make_path_figures_individual(methods20, GridEnvLarge(), "20x20")
+    make_path_figures_individual(methods30, GridEnv30(), "30x30")
     make_reward_figure(logs20, "fig_reward_20x20_all.png", "20x20 Reward Convergence (all methods)")
     make_reward_figure(logs30, "fig_reward_30x30_all.png", "30x30 Reward Convergence (all methods)")
     make_traditional_figures()
