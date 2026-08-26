@@ -214,14 +214,15 @@ def make_path_figure(methods, env, out_name, title_suffix):
     nrows = (n + ncols - 1) // ncols
     fig, axes = plt.subplots(nrows, ncols, figsize=(ncols * 4, nrows * 4))
     axes = np.atleast_1d(axes).flatten()
-    for ax, (label, mfile, kind, use_asgs, loc) in zip(axes, methods):
+    for idx, (ax, (label, mfile, kind, use_asgs, loc)) in enumerate(zip(axes, methods)):
+        letter = chr(ord('a') + idx)
         try:
             net = load_net(resolve(mfile, loc), kind)
             path, info = run_path(net, env, use_cat=(kind == "cat"), use_asgs=use_asgs)
-            plot_paths(ax, env, path, f"{label} ({len(path) - 1} steps)")
+            plot_paths(ax, env, path, f"({letter}) {label} ({len(path) - 1} steps)")
         except Exception as e:
             ax.text(0.5, 0.5, f"{label}: missing", ha='center', va='center')
-            ax.set_title(label, fontsize=10)
+            ax.set_title(f"({letter}) {label}", fontsize=10)
     for ax in axes[len(methods):]:
         ax.axis('off')
     plt.tight_layout()
@@ -264,11 +265,11 @@ def make_traditional_figures():
     ]
     for name, env, mfile in configs:
         fig, axes = plt.subplots(1, 3, figsize=(15, 5))
-        plot_paths(axes[0], env, rrt(env), "RRT", "purple")
-        plot_paths(axes[1], env, astar(env), "A*", "blue")
+        plot_paths(axes[0], env, rrt(env), "(a) RRT", "purple")
+        plot_paths(axes[1], env, astar(env), "(b) A*", "blue")
         net = load_mlp(os.path.join(PROJ, mfile))
         path, _ = run_path(net, env, use_asgs=True)
-        plot_paths(axes[2], env, path, "E1A (ours)", "red")
+        plot_paths(axes[2], env, path, "(c) E1A (ours)", "red")
         plt.tight_layout()
         plt.savefig(os.path.join(OUTDIR, f"fig_trad_compare_{name}.png"), dpi=DPI)
         plt.close()
