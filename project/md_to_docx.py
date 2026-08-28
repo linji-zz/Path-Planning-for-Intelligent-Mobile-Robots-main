@@ -9,6 +9,7 @@ from docx import Document
 from docx.shared import Pt, Cm, Inches
 from docx.enum.text import WD_ALIGN_PARAGRAPH
 from docx.oxml.ns import qn
+from docx.oxml import parse_xml
 
 BASE = os.path.dirname(os.path.abspath(__file__))
 SRC = os.path.join(BASE, "paper_draft.md")
@@ -67,6 +68,91 @@ def add_figure(doc, filename):
     set_font(cap.add_run(FIG_CAPTIONS.get(filename, filename)), "宋体", 10.5)
 
 
+# ---------------- OMML (Word native equation) helpers ----------------
+MATH_NS = "http://schemas.openxmlformats.org/officeDocument/2006/math"
+
+
+def _r(t):
+    return f'<m:r><m:t>{t}</m:t></m:r>'
+
+
+def _sub(e, s):
+    return f'<m:sSub><m:e>{e}</m:e><m:sub>{s}</m:sub></m:sSub>'
+
+
+def _sup(e, s):
+    return f'<m:sSup><m:e>{e}</m:e><m:sup>{s}</m:sup></m:sSup>'
+
+
+def _frac(n, d):
+    return f'<m:f><m:num>{n}</m:num><m:den>{d}</m:den></m:f>'
+
+
+def _paren(inner):
+    return (f'<m:d><m:dPr><m:begChr m:val="("/><m:endChr m:val=")"/></m:dPr>'
+            f'<m:e>{inner}</m:e></m:d>')
+
+
+def _sum(sub, e):
+    return (f'<m:nary><m:naryPr><m:chr m:val="∑"/><m:limLoc m:val="undOvr"/></m:naryPr>'
+            f'<m:sub>{sub}</m:sub><m:sup>{_r("")}</m:sup><m:e>{e}</m:e></m:nary>')
+
+
+def _brace_arr(rows):
+    eq = "".join(f'<m:e>{r}</m:e>' for r in rows)
+    return (f'<m:d><m:dPr><m:begChr m:val="{{"/><m:endChr m:val=""/></m:dPr>'
+            f'<m:e><m:eqArr>{eq}</m:eqArr></m:e></m:d>')
+
+
+def _omath(inner):
+    return (f'<m:oMathPara xmlns:m="{MATH_NS}"><m:oMath>{inner}</m:oMath></m:oMathPara>')
+
+
+FORMULAS = {
+    "R_total = r_dist + r_align + r_open": _omath(
+        _sub(_r("R"), _r("total")) + _r("=")
+        + _sub(_r("r"), _r("dist")) + _r("+")
+        + _sub(_r("r"), _r("align")) + _r("+")
+        + _sub(_r("r"), _r("open"))
+    ),
+    "r_dist = (d_{t-1} - d_t) * beta": _omath(
+        _sub(_r("r"), _r("dist")) + _r("=")
+        + _paren(_sub(_r("d"), _r("t-1")) + _r("−") + _sub(_r("d"), _r("t")))
+        + _r("·") + _r("β")
+    ),
+    "r_align = alpha * cos(theta - theta_goal)": _omath(
+        _sub(_r("r"), _r("align")) + _r("=") + _r("α") + _r("·") + _r("cos")
+        + _paren(_r("θ") + _r("−") + _sub(_r("θ"), _r("goal")))
+    ),
+    "r_open = gamma * (1 - N_obs / 9)": _omath(
+        _sub(_r("r"), _r("open")) + _r("=") + _r("γ") + _r("·")
+        + _paren(_r("1") + _r("−") + _frac(_sub(_r("N"), _r("obs")), _r("9")))
+    ),
+    "P(a_i) = w_i / sum(w_j),  w_i = 0.1 if obs_i = 1 else 1.0": _omath(
+        _r("P") + _paren(_sub(_r("a"), _r("i"))) + _r("=")
+        + _sub(_r("w"), _r("i")) + _r("/")
+        + _sum(_r("j"), _sub(_r("w"), _r("j"))) + _r(",  ")
+        + _sub(_r("w"), _r("i")) + _r("=")
+        + _brace_arr([
+            _r("0.1, if ") + _sub(_r("obs"), _r("i")) + _r(" = 1"),
+            _r("1.0, otherwise"),
+        ])
+    ),
+    "Q'(s, a_i) = Q(s, a_i) - lambda * obs_i": _omath(
+        _sup(_r("Q"), _r("′")) + _paren(_r("s,") + _sub(_r("a"), _r("i"))) + _r("=")
+        + _r("Q") + _paren(_r("s,") + _sub(_r("a"), _r("i"))) + _r("−")
+        + _r("λ") + _r("·") + _sub(_r("obs"), _r("i"))
+    ),
+    "lambda = 5.0 + 10.0 * (k / K)": _omath(
+        _r("λ") + _r("=") + _r("5.0") + _r("+") + _r("10.0") + _r("·") + _frac(_r("k"), _r("K"))
+    ),
+}
+
+
+def add_math(paragraph, omath_xml):
+    paragraph._p.append(parse_xml(omath_xml))
+
+
 def build_docx():
     with open(SRC, encoding="utf-8") as f:
         lines = f.read().splitlines()
@@ -85,6 +171,14 @@ def build_docx():
 
         # blank line
         if not stripped:
+            i += 1
+            continue
+
+        # equation (Word native OMML)
+        if stripped in FORMULAS:
+            p = doc.add_paragraph()
+            p.alignment = WD_ALIGN_PARAGRAPH.CENTER
+            add_math(p, FORMULAS[stripped])
             i += 1
             continue
 
