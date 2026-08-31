@@ -38,6 +38,36 @@ FIG_CAPTIONS = {
 }
 FIG_RE = re.compile(r"fig_[A-Za-z0-9_]+\.png")
 
+FIG_EN = {
+    "fig_path_20x20_S0.png": "Fig.1 Path of S0 Sparse on the 20×20 map",
+    "fig_path_20x20_E1.png": "Fig.2 Path of E1 Coupled on the 20×20 map",
+    "fig_path_20x20_E1A.png": "Fig.3 Path of E1A Coupled+ASGS on the 20×20 map",
+    "fig_path_20x20_DDQN.png": "Fig.4 Path of DDQN on the 20×20 map",
+    "fig_path_20x20_Dueling.png": "Fig.5 Path of Dueling DQN on the 20×20 map",
+    "fig_path_20x20_PER.png": "Fig.6 Path of PER DQN on the 20×20 map",
+    "fig_path_20x20_E1AC.png": "Fig.7 Path of E1AC on the 20×20 map",
+    "fig_reward_20x20_all.png": "Fig.8 Reward convergence curves on the 20×20 map",
+    "fig_path_30x30_S0.png": "Fig.9 Path of S0 Sparse on the 30×30 map",
+    "fig_path_30x30_E1.png": "Fig.10 Path of E1 Coupled on the 30×30 map",
+    "fig_path_30x30_E1A.png": "Fig.11 Path of E1A Coupled+ASGS on the 30×30 map",
+    "fig_path_30x30_DDQN.png": "Fig.12 Path of DDQN on the 30×30 map",
+    "fig_path_30x30_Dueling.png": "Fig.13 Path of Dueling DQN on the 30×30 map",
+    "fig_path_30x30_PER.png": "Fig.14 Path of PER DQN on the 30×30 map",
+    "fig_path_30x30_E1AC.png": "Fig.15 Path of E1AC on the 30×30 map",
+    "fig_reward_30x30_all.png": "Fig.16 Reward convergence curves on the 30×30 map",
+    "fig_trad_compare_20x20.png": "Fig.17 Comparison with traditional algorithms on the 20×20 map",
+    "fig_trad_compare_30x30.png": "Fig.18 Comparison with traditional algorithms on the 30×30 map",
+    "fig_noise_robustness.png": "Fig.19 Noise robustness comparison",
+}
+
+TABLE_EN = {
+    "1": "Tab.1 Experimental results on the 20×20 map (mean±std, 3 seeds)",
+    "2": "Tab.2 Experimental results on the 30×30 map (mean±std, 3 seeds)",
+    "3": "Tab.3 Comparison with improved DQN algorithms (mean±std, 3 seeds)",
+    "4": "Tab.4 Comparison with traditional algorithms",
+    "5": "Tab.5 Test success rate of clean-trained models under sensor noise (mean±std, 5 seeds, 200 greedy episodes per seed)",
+}
+
 
 def set_font(run, name, size, bold=False):
     run.font.name = name
@@ -66,6 +96,10 @@ def add_figure(doc, filename):
     cap = doc.add_paragraph()
     cap.alignment = WD_ALIGN_PARAGRAPH.CENTER
     set_font(cap.add_run(FIG_CAPTIONS.get(filename, filename)), "宋体", 10.5)
+    en = FIG_EN.get(filename)
+    if en:
+        cap.add_run().add_break()
+        set_font(cap.add_run(en), "Times New Roman", 10.5)
 
 
 # ---------------- OMML (Word native equation) helpers ----------------
@@ -234,6 +268,15 @@ def build_docx():
             p = doc.add_paragraph()
             p.alignment = WD_ALIGN_PARAGRAPH.CENTER
             add_inline(p, stripped, size=10.5)
+        # table-caption lines (表N ...) — centered + bilingual
+        elif re.match(r"^表(\d)", stripped):
+            p = doc.add_paragraph()
+            p.alignment = WD_ALIGN_PARAGRAPH.CENTER
+            set_font(p.add_run(stripped), "宋体", 10.5)
+            m = re.match(r"^表(\d)", stripped)
+            if m and m.group(1) in TABLE_EN:
+                p.add_run().add_break()
+                set_font(p.add_run(TABLE_EN[m.group(1)]), "Times New Roman", 10.5)
         # regular paragraph (may contain figure references)
         else:
             text = stripped
