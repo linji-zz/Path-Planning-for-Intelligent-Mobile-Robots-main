@@ -1,4 +1,4 @@
-# 耦合奖励、交叉注意力与安全引导增强的深度Q网络及其在栅格路径规划中的应用
+# 基于改进DQN的移动机器人路径规划
 
 ## 摘要
 
@@ -7,6 +7,8 @@
 **关键词**：深度Q网络；路径规划；耦合奖励；安全引导探索；交叉注意力
 
 ## Abstract
+
+Path planning for mobile robots based on improved DQN
 
 To address the problems of insufficient reward guidance, weak perception under sensor noise, and low exploration efficiency of the conventional Deep Q-Network (DQN) in grid-based path planning, this paper proposes three improvements—a coupled reward function (CRF), a dual-branch cross-attention transformer network (CAT-DQN), and an adaptive safety-guided strategy (ASGS)—and integrates them into a complete method termed CR-ASGS-CAT-DQN. The CRF couples distance-progress, direction-alignment, and local-openness rewards to provide dense and precise guidance signals from the perspectives of approach, direction, and safety. The CAT-DQN separates goal information from obstacle information into two branches and fuses them through cross-attention, using a five-step history to enhance perceptual robustness under sensor noise. The ASGS reduces invalid collisions through safety-weighted exploration and an adaptive Q-value penalty that strengthens with training progress. Experiments on 20×20 and 30×30 grid maps show that the core method (CRF+ASGS) improves the training success rate to 97.7%±0.8% and 96.8%±0.5%, respectively, with a stable test success rate of 100% and path lengths consistent with the optimal A* algorithm. Adding CAT keeps clean-map performance essentially unchanged, while under 20% sensor noise on the 20×20 map the CAT-DQN improves the success rate over a conventional MLP by about 17 percentage points. Ablation studies verify the positive contributions of both the direction-alignment and local-openness reward components.
 
