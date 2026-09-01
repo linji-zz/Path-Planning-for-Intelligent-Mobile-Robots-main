@@ -16,22 +16,34 @@ SRC = os.path.join(BASE, "paper_draft.md")
 OUT = os.path.join(BASE, "paper_draft.docx")
 
 FIG_CAPTIONS = {
-    "fig_paths_20x20_all.png": "图1 20×20地图各方法路径对比",
-    "fig_reward_20x20_all.png": "图2 20×20地图奖励收敛曲线",
-    "fig_paths_30x30_all.png": "图3 30×30地图各方法路径对比",
-    "fig_reward_30x30_all.png": "图4 30×30地图奖励收敛曲线",
-    "fig_trad_compare.png": "图5 与传统算法对比",
-    "fig_noise_robustness.png": "图6 噪声鲁棒性对比",
+    "fig_rl_interaction.png": "图1 强化学习交互过程",
+    "fig_dqn_structure.png": "图2 DQN训练结构",
+    "fig_cat_structure.png": "图3 CAT-DQN网络结构",
+    "fig_lambda_curve.png": "图4 ASGS修正强度λ随训练进度变化",
+    "fig_training_flow.png": "图5 完整方法训练流程",
+    "fig_grid_maps.png": "图6 栅格地图",
+    "fig_paths_20x20_all.png": "图7 20×20地图各方法路径对比",
+    "fig_reward_20x20_all.png": "图8 20×20地图奖励收敛曲线",
+    "fig_paths_30x30_all.png": "图9 30×30地图各方法路径对比",
+    "fig_reward_30x30_all.png": "图10 30×30地图奖励收敛曲线",
+    "fig_trad_compare.png": "图11 与传统算法对比",
+    "fig_noise_robustness.png": "图12 噪声鲁棒性对比",
 }
 FIG_RE = re.compile(r"fig_[A-Za-z0-9_]+\.png")
 
 FIG_EN = {
-    "fig_paths_20x20_all.png": "Fig.1 Path comparison of all methods on the 20×20 map",
-    "fig_reward_20x20_all.png": "Fig.2 Reward convergence curves on the 20×20 map",
-    "fig_paths_30x30_all.png": "Fig.3 Path comparison of all methods on the 30×30 map",
-    "fig_reward_30x30_all.png": "Fig.4 Reward convergence curves on the 30×30 map",
-    "fig_trad_compare.png": "Fig.5 Comparison with traditional algorithms",
-    "fig_noise_robustness.png": "Fig.6 Noise robustness comparison",
+    "fig_rl_interaction.png": "Fig.1 Reinforcement learning interaction process",
+    "fig_dqn_structure.png": "Fig.2 DQN training structure",
+    "fig_cat_structure.png": "Fig.3 CAT-DQN network structure",
+    "fig_lambda_curve.png": "Fig.4 ASGS strength λ vs training progress",
+    "fig_training_flow.png": "Fig.5 Training flow of the complete method",
+    "fig_grid_maps.png": "Fig.6 Grid maps",
+    "fig_paths_20x20_all.png": "Fig.7 Path comparison of all methods on the 20×20 map",
+    "fig_reward_20x20_all.png": "Fig.8 Reward convergence curves on the 20×20 map",
+    "fig_paths_30x30_all.png": "Fig.9 Path comparison of all methods on the 30×30 map",
+    "fig_reward_30x30_all.png": "Fig.10 Reward convergence curves on the 30×30 map",
+    "fig_trad_compare.png": "Fig.11 Comparison with traditional algorithms",
+    "fig_noise_robustness.png": "Fig.12 Noise robustness comparison",
 }
 
 TABLE_EN = {
