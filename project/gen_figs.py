@@ -208,23 +208,28 @@ logs30 = [
 ]
 
 
-def make_path_figures_individual(methods, env, map_name):
-    """每个方法生成一张独立的路径图（拆分宫格）。"""
-    for label, mfile, kind, use_asgs, loc in methods:
-        short = label.split()[0]
-        out_name = f"fig_path_{map_name}_{short}.png"
-        fig, ax = plt.subplots(figsize=(6, 6))
+def make_path_figure(methods, env, out_name):
+    """各方法路径对比宫格图，子图用 (a)(b)(c)... 标注。"""
+    n = len(methods)
+    ncols = 4
+    nrows = (n + ncols - 1) // ncols
+    fig, axes = plt.subplots(nrows, ncols, figsize=(ncols * 4, nrows * 4))
+    axes = np.atleast_1d(axes).flatten()
+    for idx, (ax, (label, mfile, kind, use_asgs, loc)) in enumerate(zip(axes, methods)):
+        letter = chr(ord('a') + idx)
         try:
             net = load_net(resolve(mfile, loc), kind)
             path, info = run_path(net, env, use_cat=(kind == "cat"), use_asgs=use_asgs)
-            plot_paths(ax, env, path, f"{label} ({len(path) - 1} steps)")
+            plot_paths(ax, env, path, f"({letter}) {label} ({len(path) - 1} steps)")
         except Exception as e:
             ax.text(0.5, 0.5, f"{label}: missing", ha='center', va='center')
-            ax.set_title(label, fontsize=10)
-        plt.tight_layout()
-        plt.savefig(os.path.join(OUTDIR, out_name), dpi=DPI)
-        plt.close()
-        print(f"Saved {out_name}")
+            ax.set_title(f"({letter}) {label}", fontsize=10)
+    for ax in axes[len(methods):]:
+        ax.axis('off')
+    plt.tight_layout()
+    plt.savefig(os.path.join(OUTDIR, out_name), dpi=DPI)
+    plt.close()
+    print(f"Saved {out_name}")
 
 
 def make_reward_figure(logs, out_name, title):
@@ -259,17 +264,19 @@ def make_traditional_figures():
         ("20x20", GridEnvLarge(), "dqn_E1_coupled_ASGS_20x20_10000.pth"),
         ("30x30", GridEnv30(), "dqn_E1_coupled_ASGS_30x30_10000.pth"),
     ]
-    for name, env, mfile in configs:
-        fig, axes = plt.subplots(1, 3, figsize=(15, 5))
-        plot_paths(axes[0], env, rrt(env), "(a) RRT", "purple")
-        plot_paths(axes[1], env, astar(env), "(b) A*", "blue")
+    fig, axes = plt.subplots(2, 3, figsize=(15, 10))
+    for row, (name, env, mfile) in enumerate(configs):
+        base = row * 3
+        letters = [chr(ord('a') + base + k) for k in range(3)]
+        plot_paths(axes[row][0], env, rrt(env), f"({letters[0]}) {name} RRT", "purple")
+        plot_paths(axes[row][1], env, astar(env), f"({letters[1]}) {name} A*", "blue")
         net = load_mlp(os.path.join(PROJ, mfile))
         path, _ = run_path(net, env, use_asgs=True)
-        plot_paths(axes[2], env, path, "(c) E1A (ours)", "red")
-        plt.tight_layout()
-        plt.savefig(os.path.join(OUTDIR, f"fig_trad_compare_{name}.png"), dpi=DPI)
-        plt.close()
-        print(f"Saved fig_trad_compare_{name}.png")
+        plot_paths(axes[row][2], env, path, f"({letters[2]}) {name} E1A (ours)", "red")
+    plt.tight_layout()
+    plt.savefig(os.path.join(OUTDIR, "fig_trad_compare.png"), dpi=DPI)
+    plt.close()
+    print("Saved fig_trad_compare.png")
 
 
 def make_noise_figure():
@@ -287,7 +294,7 @@ def make_noise_figure():
     if len(present) == 1:
         axes = [axes]
 
-    for ax, (name, p) in zip(axes, present):
+    for i, (ax, (name, p)) in enumerate(zip(axes, present)):
         with open(p, "r", encoding="utf-8") as f:
             res = json.load(f)
         noise_levels = res["noise_levels"]
@@ -307,7 +314,7 @@ def make_noise_figure():
                     label='CAT', linewidth=1.5, capsize=3)
         ax.set_xlabel("Sensor noise level (%)")
         ax.set_ylabel("Success rate (%)")
-        ax.set_title(f"{name} noise robustness (mean±std)")
+        ax.set_title(f"({chr(ord('a') + i)}) {name} noise robustness")
         ax.set_ylim(0, 105)
         ax.grid(alpha=0.3)
         ax.legend()
@@ -322,8 +329,8 @@ if __name__ == "__main__":
     from env_large import GridEnvLarge
     from env_large30 import GridEnv30
 
-    make_path_figures_individual(methods20, GridEnvLarge(), "20x20")
-    make_path_figures_individual(methods30, GridEnv30(), "30x30")
+    make_path_figure(methods20, GridEnvLarge(), "fig_paths_20x20_all.png")
+    make_path_figure(methods30, GridEnv30(), "fig_paths_30x30_all.png")
     make_reward_figure(logs20, "fig_reward_20x20_all.png", "20x20 Reward Convergence (all methods)")
     make_reward_figure(logs30, "fig_reward_30x30_all.png", "30x30 Reward Convergence (all methods)")
     make_traditional_figures()
