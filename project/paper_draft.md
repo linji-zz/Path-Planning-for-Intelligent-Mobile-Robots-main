@@ -16,7 +16,7 @@ To address the problems of insufficient reward guidance, weak perception under s
 
 ## 1 引言
 
-移动机器人已在工业制造、物流仓储、医疗服务、农业[17]等领域获得广泛应用。路径规划作为移动机器人自主导航的核心技术之一[1]，要求在存在障碍物的环境中，从起点到目标点找出一条安全无碰撞的路径。传统的路径规划算法如Dijkstra算法[2]、A*算法[3]、快速扩展随机树（RRT）算法[4]以及蚁群算法等，大多依赖全局环境信息进行建模与求解。这类方法在环境已知且静态的场景下表现良好，但当环境复杂、动态变化或部分不可观测时，其规划的实时性、适应性和鲁棒性往往难以保证。
+移动机器人已在工业制造、物流仓储、医疗服务、农业[1]等领域获得广泛应用。路径规划作为移动机器人自主导航的核心技术之一[2]，要求在存在障碍物的环境中，从起点到目标点找出一条安全无碰撞的路径。传统的路径规划算法如Dijkstra算法[3]、A*算法[4]、快速扩展随机树（RRT）算法[5]以及蚁群算法等，大多依赖全局环境信息进行建模与求解。这类方法在环境已知且静态的场景下表现良好，但当环境复杂、动态变化或部分不可观测时，其规划的实时性、适应性和鲁棒性往往难以保证。
 
 为克服传统方法的局限性，研究者将深度强化学习引入路径规划领域[6]。深度强化学习将深度学习在特征提取方面的优势与强化学习在序贯决策方面的能力相结合，使机器人能够通过与环境交互，直接从原始传感器信息中学习路径规划策略，无需预先构建全局环境模型。深度Q网络（Deep Q-Network, DQN）[7]作为深度强化学习的代表性算法，利用经验回放和目标网络机制有效解决了Q-learning在复杂状态空间中的收敛问题，已被成功应用于移动机器人的路径规划任务[8-9]。
 
@@ -44,7 +44,7 @@ To address the problems of insufficient reward guidance, weak perception under s
 
 ### 2.1 基于深度强化学习的路径规划
 
-深度强化学习将感知与决策相结合，已在栅格路径规划中得到广泛应用。Mnih等[7]提出的DQN通过经验回放与目标网络解决了Q-learning在复杂状态空间中的收敛问题；Van Hasselt等[21]提出的Double DQN通过解耦动作选择与价值评估降低Q值过估计；Wang等[22]提出的Dueling DQN将Q值分解为状态价值与动作优势，提升了价值估计的稳定性；Schaul等[23]提出的优先经验回放（PER）按时序差分误差采样，提高样本利用效率。在国内研究中，谢天等[8]、于效民等[9]、李奇儒等[16]分别将改进DQN应用于移动机器人路径规划，验证了深度强化学习方法在未知环境下学习策略的可行性；张磊等[24]通过改进深度双Q网络提升了栅格环境下的路径规划成功率；倪培龙等[19]将A*启发信息与Double DQN结合，改善了早期探索效率；付文浩等[20]将改进Dueling-DQN应用于多无人机路径规划；白泽琨[18]研究了复杂环境下基于强化学习的自主移动机器人路径规划；李海亮等[5]利用蚁群算法引导深度Q网络进行路径规划。上述方法主要从算法框架层面改进，未系统考虑奖励引导、感知表征与探索策略三者之间的协同。
+深度强化学习将感知与决策相结合，已在栅格路径规划中得到广泛应用。Mnih等[7]提出的DQN通过经验回放与目标网络解决了Q-learning在复杂状态空间中的收敛问题；Van Hasselt等[16]提出的Double DQN通过解耦动作选择与价值评估降低Q值过估计；Wang等[17]提出的Dueling DQN将Q值分解为状态价值与动作优势，提升了价值估计的稳定性；Schaul等[18]提出的优先经验回放（PER）按时序差分误差采样，提高样本利用效率。在国内研究中，谢天等[8]、于效民等[9]、李奇儒等[19]分别将改进DQN应用于移动机器人路径规划，验证了深度强化学习方法在未知环境下学习策略的可行性；张磊等[20]通过改进深度双Q网络提升了栅格环境下的路径规划成功率；倪培龙等[21]将A*启发信息与Double DQN结合，改善了早期探索效率；付文浩等[22]将改进Dueling-DQN应用于多无人机路径规划；白泽琨[23]研究了复杂环境下基于强化学习的自主移动机器人路径规划；李海亮等[24]利用蚁群算法引导深度Q网络进行路径规划。上述方法主要从算法框架层面改进，未系统考虑奖励引导、感知表征与探索策略三者之间的协同。
 
 ### 2.2 奖励函数设计
 
@@ -284,11 +284,11 @@ lambda = 5.0 + 10.0 * (k / K)
 
 ## 参考文献
 
-[1] 吴锦涛. 移动机器人路径规划算法研究综述[J]. (2025).
-[2] Dijkstra E W. A note on two problems in connexion with graphs[J]. Numerische Mathematik, 1959, 1(1): 269-271.
-[3] Hart P E, Nilsson N J, Raphael B. A formal basis for the heuristic determination of minimum cost paths[J]. IEEE Transactions on Systems Science and Cybernetics, 1968, 4(2): 100-107.
-[4] LaValle S M. Rapidly-exploring random trees: A new tool for path planning[R]. Iowa State University, 1998.
-[5] 李海亮. 基于蚁群算法引导深度Q网络的移动机器人路径规划算法[J]. (2025).
+[1] 赵威. 基于改进深度强化学习算法的农业机器人路径规划[J]. (2024).
+[2] 吴锦涛. 移动机器人路径规划算法研究综述[J]. (2025).
+[3] Dijkstra E W. A note on two problems in connexion with graphs[J]. Numerische Mathematik, 1959, 1(1): 269-271.
+[4] Hart P E, Nilsson N J, Raphael B. A formal basis for the heuristic determination of minimum cost paths[J]. IEEE Transactions on Systems Science and Cybernetics, 1968, 4(2): 100-107.
+[5] LaValle S M. Rapidly-exploring random trees: A new tool for path planning[R]. Iowa State University, 1998.
 [6] 黄鑫. 基于深度强化学习的路径规划算法综述[J]. (2024).
 [7] Mnih V, Kavukcuoglu K, Silver D, et al. Human-level control through deep reinforcement learning[J]. Nature, 2015, 518(7540): 529-533.
 [8] 谢天. 基于改进深度Q网络的移动机器人路径规划算法[J]. (2023).
@@ -299,12 +299,12 @@ lambda = 5.0 + 10.0 * (k / K)
 [13] 马海杰, 薛安宏. 基于深度注意力Q网络的机器人路径规划研究[J]. 传感器与微系统, 2024, 43(12): 66-70.
 [14] Sharma H, Tiwari R, Shukla S, et al. Transformer-Enhanced Deep Q-Learning for robotic path planning[J]. Cluster Computing, 2026, 29: 271.
 [15] Zhang J, Guo Y, Ding F. 基于人工势场信息与改进深度Q学习的机器人路径规划方法[J]. 小型微型计算机系统, 2025.
-[16] 李奇儒, 闫凯. 基于改进DQN算法的机器人路径规划[J]. 计算机工程, 2023, 49(12): 111-120.
-[17] 赵威. 基于改进深度强化学习算法的农业机器人路径规划[J]. (2024).
-[18] 白泽琨. 复杂环境下基于强化学习的自主移动机器人路径规划算法研究[D]. (2025).
-[19] 倪培龙. 基于改进A-DDQN算法的机器人路径规划[J]. (2025).
-[20] 付文浩. 基于改进Dueling-DQN的多无人机路径规划算法[J]. (2024).
-[21] Van Hasselt H, Guez A, Silver D. Deep reinforcement learning with double Q-learning[C]. Proceedings of the AAAI Conference on Artificial Intelligence, 2016, 30(1): 2094-2100.
-[22] Wang Z, Schaul T, Hessel M, et al. Dueling network architectures for deep reinforcement learning[C]. Proceedings of the 33rd International Conference on Machine Learning, 2016: 1995-2003.
-[23] Schaul T, Quan J, Antonoglou I, et al. Prioritized experience replay[C]. Proceedings of the 4th International Conference on Learning Representations, 2016.
-[24] 张磊. 基于改进深度双Q网络的移动机器人路径规划算法[J]. (2024).
+[16] Van Hasselt H, Guez A, Silver D. Deep reinforcement learning with double Q-learning[C]. Proceedings of the AAAI Conference on Artificial Intelligence, 2016, 30(1): 2094-2100.
+[17] Wang Z, Schaul T, Hessel M, et al. Dueling network architectures for deep reinforcement learning[C]. Proceedings of the 33rd International Conference on Machine Learning, 2016: 1995-2003.
+[18] Schaul T, Quan J, Antonoglou I, et al. Prioritized experience replay[C]. Proceedings of the 4th International Conference on Learning Representations, 2016.
+[19] 李奇儒, 闫凯. 基于改进DQN算法的机器人路径规划[J]. 计算机工程, 2023, 49(12): 111-120.
+[20] 张磊. 基于改进深度双Q网络的移动机器人路径规划算法[J]. (2024).
+[21] 倪培龙. 基于改进A-DDQN算法的机器人路径规划[J]. (2025).
+[22] 付文浩. 基于改进Dueling-DQN的多无人机路径规划算法[J]. (2024).
+[23] 白泽琨. 复杂环境下基于强化学习的自主移动机器人路径规划算法研究[D]. (2025).
+[24] 李海亮. 基于蚁群算法引导深度Q网络的移动机器人路径规划算法[J]. (2025).
