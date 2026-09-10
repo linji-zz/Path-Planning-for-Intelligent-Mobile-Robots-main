@@ -45,12 +45,13 @@ def _arrow(ax, x1, y1, x2, y2, text=None, fs=8, txy=(0, 2)):
 
 
 def fig_rl_interaction():
-    fig, ax = plt.subplots(figsize=(7, 3.6))
+    fig, ax = plt.subplots(figsize=(7, 4.5))
     ax.set_xlim(0, 1); ax.set_ylim(0, 1); ax.axis("off")
-    _box(ax, 0.08, 0.35, 0.30, 0.30, "智能体\n(Agent)", fc="#dbeafe", fs=11)
-    _box(ax, 0.62, 0.35, 0.30, 0.30, "环境\n(Environment)", fc="#d1fae5", fs=11)
-    _arrow(ax, 0.38, 0.62, 0.62, 0.62, "动作 a", fs=9)
-    _arrow(ax, 0.62, 0.38, 0.38, 0.38, "状态 s′、奖励 r", fs=9, txy=(0, -14))
+    _box(ax, 0.04, 0.36, 0.30, 0.32, "机器人\n(Agent)", fc="#dbeafe", fs=12)
+    _box(ax, 0.66, 0.36, 0.30, 0.32, "环境\n(Environment)", fc="#d1fae5", fs=12)
+    _arrow(ax, 0.34, 0.62, 0.66, 0.62, "动作 A_t", fs=10, txy=(0, 16))
+    _arrow(ax, 0.66, 0.38, 0.34, 0.38, "状态 S_{t+1}、奖励 R_t", fs=10, txy=(0, -22))
+    ax.text(0.19, 0.82, "初始状态 S_t", fontsize=10, ha="center")
     plt.tight_layout()
     plt.savefig(os.path.join(OUTDIR, "fig_rl_interaction.png"), dpi=DPI)
     plt.close()
